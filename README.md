@@ -119,6 +119,8 @@ FormGenius-AI/
 3. Enable Developer Mode
 4. Load Unpacked → Select Project folder
 
+---
+
 ## 🏆Why This Project Matters
 This project demonstrates real-world engineering skills:
 
