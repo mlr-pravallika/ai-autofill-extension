@@ -1,4 +1,4 @@
-<img width="1915" height="1024" alt="image" src="https://github.com/user-attachments/assets/43e4651c-4fdb-4221-8f42-be188c40735b" /># ai-autofill-extension
+# ai-autofill-extension
 Intelligent Form Autofill AI Chrome Extension
 
 # 🚀 Smart Autofill AI Chrome Extension
