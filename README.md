@@ -1,9 +1,9 @@
 # ai-autofill-extension
-Intelligent Form Autofill Chrome Extension
+Intelligent Form Autofill AI Chrome Extension
 
-# 🚀 FormGenius AI – Intelligent Form Autofill Extension
+# 🚀 Smart Autofill AI Chrome Extension
 
-FormGenius AI is a smart Chrome extension that automatically fills web forms using intelligently using DOM parsing and backend-generated responses.
+AI-powered browser extension that automatically fills web forms using intelligently using DOM parsing and backend-generated responses.
 
 ---
 
@@ -11,6 +11,7 @@ FormGenius AI is a smart Chrome extension that automatically fills web forms usi
 
 - Detects all input fields dynamically
 - Instantly fills forms
+- Fills only required fields
 - Supports multiple input types
 - Generates responses using backend AI
 - Works across any website
