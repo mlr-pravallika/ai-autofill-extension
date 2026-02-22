@@ -1,38 +1,24 @@
 document.addEventListener("DOMContentLoaded", () => {
 
-  const fillAll = document.getElementById("fillAll");
-  const fillRequired = document.getElementById("fillRequired");
+const fillAllBtn = document.getElementById("fillAll")
+const requiredBtn = document.getElementById("fillRequired")
+const saveBtn = document.getElementById("save")
 
-  if(!fillAll || !fillRequired){
-    console.error("Buttons not found");
-    return;
-  }
+if(fillAllBtn)
+fillAllBtn.onclick = async () => {
+const [tab] = await chrome.tabs.query({active:true,currentWindow:true})
+chrome.tabs.sendMessage(tab.id,{action:"fillAll"})
+}
 
-  fillAll.addEventListener("click", async () => {
+if(requiredBtn)
+requiredBtn.onclick = async () => {
+const [tab] = await chrome.tabs.query({active:true,currentWindow:true})
+chrome.tabs.sendMessage(tab.id,{action:"fillRequired"})
+}
 
-    const [tab] = await chrome.tabs.query({
-      active:true,
-      currentWindow:true
-    });
+if(saveBtn)
+saveBtn.onclick = () => {
+alert("Data Saved ✅")
+}
 
-    chrome.tabs.sendMessage(tab.id,{
-      action:"fillAll"
-    });
-
-  });
-
-
-  fillRequired.addEventListener("click", async () => {
-
-    const [tab] = await chrome.tabs.query({
-      active:true,
-      currentWindow:true
-    });
-
-    chrome.tabs.sendMessage(tab.id,{
-      action:"fillRequired"
-    });
-
-  });
-
-});
+})

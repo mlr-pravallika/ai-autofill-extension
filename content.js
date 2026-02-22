@@ -1,130 +1,104 @@
 console.log("Smart Autofill Loaded");
-console.log("AI Autofill Running");
+console.log("Smart Autofill Active");
 
-/* PROFILE DATA */
-const profile = {
-  name: "Pravallika",
-  email: "pravallika@gmail.com",
-  phone: "9876543210",
-  city: "Hyderabad",
-  college: "XYZ University",
-  degree: "BTech Computer Science",
-  skills: "JavaScript, Python, React, SQL",
-  experience: "Fresher",
-  about: "Motivated developer passionate about building scalable applications."
-};
-
-
-/* MESSAGE LISTENER */
+// LISTENER
 chrome.runtime.onMessage.addListener((msg)=>{
-  if(msg.action==="fillAll") smartFill(false);
-  if(msg.action==="fillRequired") smartFill(true);
-});
+if(msg.action==="fillAll") fillForm(false)
+if(msg.action==="fillRequired") fillForm(true)
+})
 
+async function fillForm(requiredOnly){
 
-async function smartFill(requiredOnly){
+const data = await chrome.storage.local.get("profile")
+const profile = data.profile || {}
 
-  const fields=[
-    ...document.querySelectorAll("input,textarea,select"),
-    ...document.querySelectorAll('[contenteditable="true"]')
-  ];
+const fields = document.querySelectorAll("input, textarea, select")
 
-  for(const field of fields){
+fields.forEach(field=>{
 
-    if(requiredOnly && !field.required) continue;
+if(requiredOnly && !field.required) return
+if(field.disabled || field.readOnly) return
 
-    const label = detectLabel(field).toLowerCase();
+let labelText = ""
+let label = document.querySelector(`label[for="${field.id}"]`)
+if(label) labelText = label.innerText.toLowerCase()
 
-    const value = matchValue(label,field.type);
+let key = (
+(field.name||"")+
+(field.id||"")+
+(field.placeholder||"")+
+labelText
+).toLowerCase()
 
-    if(value) await typeLikeHuman(field,value);
+let value=""
 
-    triggerEvents(field);
+// SMART MATCHING
+if(key.includes("name"))
+value = profile.name || "John Doe"
 
-    highlight(field);
+else if(key.includes("mail") || key.includes("email"))
+value = profile.email || "demo@mail.com"
 
-    await sleep(120);
-  }
+else if(key.includes("phone") || key.includes("mobile"))
+value = profile.phone || "9876543210"
 
-  console.log("DONE");
+else if(key.includes("date"))
+value = "2025-01-01"
+
+else if(field.type==="password")
+value = "Password@123"
+
+else if(field.type==="color")
+value = "#22c55e"
+
+else if(field.tagName==="SELECT"){
+if(field.options.length>1) field.selectedIndex=1
+return
 }
 
-
-
-/* DETECT LABEL */
-function detectLabel(field){
-
-  return (
-    field.name ||
-    field.id ||
-    field.placeholder ||
-    field.getAttribute("aria-label") ||
-    field.closest("label")?.innerText ||
-    ""
-  );
+else if(field.type==="checkbox" || field.type==="radio"){
+field.checked=true
+return
 }
 
+else
+value="Demo"
 
+// APPLY VALUE SAFELY
+try{
 
-/* MATCH FIELD VALUE */
-function matchValue(label,type){
-
-  if(label.includes("name")) return profile.name;
-  if(label.includes("mail")) return profile.email;
-  if(label.includes("phone")) return profile.phone;
-  if(label.includes("city")) return profile.city;
-  if(label.includes("college")) return profile.college;
-  if(label.includes("degree")) return profile.degree;
-  if(label.includes("skill")) return profile.skills;
-  if(label.includes("experience")) return profile.experience;
-  if(label.includes("about")||label.includes("summary"))
-    return profile.about;
-
-  if(type==="email") return profile.email;
-  if(type==="tel") return profile.phone;
-
-  return null;
+if(field.type==="checkbox" || field.type==="radio"){
+    field.checked=true
 }
 
-
-
-/* HUMAN TYPING SIMULATION */
-async function typeLikeHuman(el,text){
-
-  el.focus();
-  el.value="";
-
-  for(const char of text){
-    el.value+=char;
-    el.dispatchEvent(new Event("input",{bubbles:true}));
-    await sleep(25);
-  }
+else if(field.type==="range"){
+    field.value = field.min || 1
 }
 
-
-
-/* EVENTS FOR REACT FORMS */
-function triggerEvents(el){
-
-  el.dispatchEvent(new Event("change",{bubbles:true}));
-  el.dispatchEvent(new Event("blur",{bubbles:true}));
+else if(field.type==="file"){
+    return // cannot autofill file inputs
 }
 
-
-
-/* HIGHLIGHT */
-function highlight(el){
-  el.style.background="#d4ffd4";
+else if(field.tagName==="SELECT"){
+    if(field.options.length>1) field.selectedIndex=1
 }
 
-
-
-/* DELAY */
-function sleep(ms){
-  return new Promise(r=>setTimeout(r,ms));
+else{
+    field.value=value
 }
-const submitBtn = document.querySelector("button[type=submit], input[type=submit]");
-if (submitBtn) {
-    submitBtn.style.border = "3px solid lime";
+
+field.dispatchEvent(new Event("input",{bubbles:true}))
+field.dispatchEvent(new Event("change",{bubbles:true}))
+
+field.style.background="#d4ffd4"
+
+}catch(err){
+console.warn("Skipped field:",field)
 }
-    
+
+// highlight filled fields
+field.style.background="#d4ffd4"
+
+})
+
+}
