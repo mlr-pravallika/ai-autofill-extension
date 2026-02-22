@@ -3,9 +3,20 @@ Intelligent Form Autofill AI Chrome Extension
 
 # 🚀 Smart Autofill AI Chrome Extension
 
+> Intelligent browser automation tool for smart form completion
+
+![Chrome Extension](https://img.shields.io/badge/Type-ChromeExtension-blue)
+![JavaScript](https://img.shields.io/badge/Language-JavaScript-yellow)
+![Status](https://img.shields.io/badge/Status-Working-success)
+![Level](https://img.shields.io/badge/Project-Level%20Advanced-purple)
+
 AI-powered browser extension that automatically fills web forms using intelligently using DOM parsing and backend-generated responses.
 
----
+## 🧠 Problem
+Filling repetitive forms manually is time-consuming and inefficient.
+
+## 💡 Solution
+Smart Autofill AI automatically detects fields and fills them intelligently.
 
 ## 🚀 Features
 
@@ -85,6 +96,15 @@ FormGenius-AI/
 
 ---
 
+##🎥Demo
+
+<img width="485" height="718" alt="image" src="https://github.com/user-attachments/assets/255c9105-0177-4f16-9ebc-23d4a319f775" />
+<img width="436" height="679" alt="image" src="https://github.com/user-attachments/assets/527d12d6-911f-46a0-9eb2-2b8e55805f05" />
+<img width="554" height="603" alt="image" src="https://github.com/user-attachments/assets/e95ad2c5-095b-4aea-9fec-07b8439ef7ac" />
+<img width="1915" height="1024" alt="image" src="https://github.com/user-attachments/assets/469135ca-58e5-4e54-859d-e40dfb672dea" />
+
+---
+
 ## 🏗️Installation
 1. Clone repo
 2. Open Chrome → Extensions
@@ -124,4 +144,7 @@ This project demonstrates real-world engineering skills:
 ## ⭐ Project Impact
 
 FormGenius AI showcases practical automation engineering skills and demonstrates the ability to build production-style browser tools that solve real problems efficiently.
+
+## 🏆 Recruiter Note
+This project demonstrates real-world automation engineering, DOM parsing, browser APIs, and backend integration skills.
 
