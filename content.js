@@ -1,146 +1,130 @@
-console.log("CONTENT SCRIPT RUNNING");
-if(window.location.hostname.includes("linkedin"))
-    console.log("LinkedIn mode activated")
+console.log("Smart Autofill Loaded");
+console.log("AI Autofill Running");
 
-console.log("AI Autofill Content Script Loaded")
+/* PROFILE DATA */
+const profile = {
+  name: "Pravallika",
+  email: "pravallika@gmail.com",
+  phone: "9876543210",
+  city: "Hyderabad",
+  college: "XYZ University",
+  degree: "BTech Computer Science",
+  skills: "JavaScript, Python, React, SQL",
+  experience: "Fresher",
+  about: "Motivated developer passionate about building scalable applications."
+};
 
-// Listen for popup message
-chrome.runtime.onMessage.addListener(async (msg) => {
-    if (msg.action === "fillForm")
-        await smartFill();
 
-    if (msg.action === "fillRequired")
-        await smartFill(true);
+/* MESSAGE LISTENER */
+chrome.runtime.onMessage.addListener((msg)=>{
+  if(msg.action==="fillAll") smartFill(false);
+  if(msg.action==="fillRequired") smartFill(true);
 });
 
-async function smartFill(requiredOnly=false){
 
-    const fields = document.querySelectorAll("input, textarea, select");
+async function smartFill(requiredOnly){
 
-    for (let field of fields){
+  const fields=[
+    ...document.querySelectorAll("input,textarea,select"),
+    ...document.querySelectorAll('[contenteditable="true"]')
+  ];
 
-        if(field.disabled || field.readOnly || field.type==="hidden")
-            continue;
+  for(const field of fields){
 
-        if(requiredOnly && !field.required)
-            continue;
+    if(requiredOnly && !field.required) continue;
 
-        const label = getLabel(field).toLowerCase();
+    const label = detectLabel(field).toLowerCase();
 
-        try{
+    const value = matchValue(label,field.type);
 
-            // NAME
-            if(label.includes("name"))
-                field.value="Pravallika";
+    if(value) await typeLikeHuman(field,value);
 
-            // EMAIL
-            else if(label.includes("mail"))
-                field.value="pravallika@gmail.com";
+    triggerEvents(field);
 
-            // PHONE
-            else if(label.includes("phone"))
-                field.value="9876543210";
+    highlight(field);
 
-            // LINKEDIN
-            else if(label.includes("linkedin"))
-                field.value="https://linkedin.com/in/pravallika";
+    await sleep(120);
+  }
 
-            // PASSWORD
-            else if(field.type==="password")
-                field.value="Password@123";
-
-            // DATE
-            else if(field.type==="date")
-                field.value="2024-12-31";
-
-            // NUMBER
-            else if(field.type==="number")
-                field.value=25;
-
-            // RANGE
-            else if(field.type==="range")
-                field.value=60;
-
-            // COLOR
-            else if(field.type==="color")
-                field.value="#00ff88";
-
-            // CHECKBOX
-            else if(field.type==="checkbox")
-                field.checked=true;
-
-            // RADIO
-            else if(field.type==="radio")
-                field.checked=true;
-
-            // SELECT
-            else if(field.tagName==="SELECT")
-                field.selectedIndex=1;
-
-            // FILE UPLOAD
-            else if(field.type==="file"){
-                console.log("File upload requires manual selection for security");
-            }
-
-            // TEXTAREA AI ANSWER
-            else if(field.tagName==="TEXTAREA"){
-
-                const question = field.placeholder || label || "Tell about yourself";
-
-                const res = await fetch("http://localhost:3000/ask",{
-                    method:"POST",
-                    headers:{ "Content-Type":"application/json" },
-                    body:JSON.stringify({question})
-                });
-
-                const data = await res.json();
-
-                field.value=data.answer;
-            }
-
-            // NORMAL TEXT
-            else if(field.type==="text")
-                field.value="Demo Text";
-
-            field.style.background="#d4ffd4";
-
-            trigger(field);
-
-        }catch(err){
-            console.log("Fill error:",err);
-        }
-    }
-
-    alert("🚀 Smart AI Autofill Completed");
+  console.log("DONE");
 }
 
 
 
-function getLabel(field){
+/* DETECT LABEL */
+function detectLabel(field){
 
-    let label="";
-
-    if(field.labels?.length)
-        label=field.labels[0].innerText;
-
-    if(!label && field.placeholder)
-        label=field.placeholder;
-
-    if(!label && field.name)
-        label=field.name;
-
-    if(!label && field.id)
-        label=field.id;
-
-    return label;
+  return (
+    field.name ||
+    field.id ||
+    field.placeholder ||
+    field.getAttribute("aria-label") ||
+    field.closest("label")?.innerText ||
+    ""
+  );
 }
 
-function trigger(el){
+
+
+/* MATCH FIELD VALUE */
+function matchValue(label,type){
+
+  if(label.includes("name")) return profile.name;
+  if(label.includes("mail")) return profile.email;
+  if(label.includes("phone")) return profile.phone;
+  if(label.includes("city")) return profile.city;
+  if(label.includes("college")) return profile.college;
+  if(label.includes("degree")) return profile.degree;
+  if(label.includes("skill")) return profile.skills;
+  if(label.includes("experience")) return profile.experience;
+  if(label.includes("about")||label.includes("summary"))
+    return profile.about;
+
+  if(type==="email") return profile.email;
+  if(type==="tel") return profile.phone;
+
+  return null;
+}
+
+
+
+/* HUMAN TYPING SIMULATION */
+async function typeLikeHuman(el,text){
+
+  el.focus();
+  el.value="";
+
+  for(const char of text){
+    el.value+=char;
     el.dispatchEvent(new Event("input",{bubbles:true}));
-    el.dispatchEvent(new Event("change",{bubbles:true}));
+    await sleep(25);
+  }
 }
 
-const submitBtn = document.querySelector("button[type=submit], input[type=submit]");
 
-if (submitBtn)
+
+/* EVENTS FOR REACT FORMS */
+function triggerEvents(el){
+
+  el.dispatchEvent(new Event("change",{bubbles:true}));
+  el.dispatchEvent(new Event("blur",{bubbles:true}));
+}
+
+
+
+/* HIGHLIGHT */
+function highlight(el){
+  el.style.background="#d4ffd4";
+}
+
+
+
+/* DELAY */
+function sleep(ms){
+  return new Promise(r=>setTimeout(r,ms));
+}
+const submitBtn = document.querySelector("button[type=submit], input[type=submit]");
+if (submitBtn) {
     submitBtn.style.border = "3px solid lime";
+}
+    

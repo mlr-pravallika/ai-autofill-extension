@@ -1,8 +1,38 @@
-console.log("Popup loaded");
-async function send(action){
-    let [tab]=await chrome.tabs.query({active:true,currentWindow:true});
-    await chrome.tabs.sendMessage(tab.id,{action});
-}
+document.addEventListener("DOMContentLoaded", () => {
 
-document.getElementById("fill").onclick=()=>send("fillForm");
-document.getElementById("req").onclick=()=>send("fillRequired");
+  const fillAll = document.getElementById("fillAll");
+  const fillRequired = document.getElementById("fillRequired");
+
+  if(!fillAll || !fillRequired){
+    console.error("Buttons not found");
+    return;
+  }
+
+  fillAll.addEventListener("click", async () => {
+
+    const [tab] = await chrome.tabs.query({
+      active:true,
+      currentWindow:true
+    });
+
+    chrome.tabs.sendMessage(tab.id,{
+      action:"fillAll"
+    });
+
+  });
+
+
+  fillRequired.addEventListener("click", async () => {
+
+    const [tab] = await chrome.tabs.query({
+      active:true,
+      currentWindow:true
+    });
+
+    chrome.tabs.sendMessage(tab.id,{
+      action:"fillRequired"
+    });
+
+  });
+
+});
